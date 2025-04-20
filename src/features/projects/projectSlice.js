@@ -122,4 +122,211 @@ export const updateMilestoneStatus = createAsyncThunk(
   'projects/updateMilestoneStatus',
   async ({ projectId, milestoneId, status }, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.put(`
+      const response = await axiosInstance.put(`/projects/${projectId}/milestones/${milestoneId}`, { status });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to update milestone status');
+    }
+  }
+);
+
+export const fetchProjectById = createAsyncThunk(
+  'projects/fetchProjectById',
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(`/projects/${id}`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch project');
+    }
+  }
+);
+
+const initialState = {
+  projects: [],
+  currentProject: null,
+  loading: false,
+  error: null,
+};
+
+const projectSlice = createSlice({
+  name: 'projects',
+  initialState,
+  reducers: {
+    setCurrentProject: (state, action) => {
+      state.currentProject = action.payload;
+    },
+    clearError: (state) => {
+      state.error = null;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      // Fetch Projects
+      .addCase(fetchProjects.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchProjects.fulfilled, (state, action) => {
+        state.loading = false;
+        state.projects = action.payload;
+      })
+      .addCase(fetchProjects.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Fetch User Projects
+      .addCase(fetchUserProjects.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUserProjects.fulfilled, (state, action) => {
+        state.loading = false;
+        state.projects = action.payload;
+      })
+      .addCase(fetchUserProjects.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Create Project
+      .addCase(createProject.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createProject.fulfilled, (state, action) => {
+        state.loading = false;
+        state.projects.push(action.payload);
+      })
+      .addCase(createProject.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Update Project
+      .addCase(updateProject.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateProject.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.projects.findIndex((project) => project._id === action.payload._id);
+        if (index !== -1) {
+          state.projects[index] = action.payload;
+        }
+        if (state.currentProject?._id === action.payload._id) {
+          state.currentProject = action.payload;
+        }
+      })
+      .addCase(updateProject.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Delete Project
+      .addCase(deleteProject.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteProject.fulfilled, (state, action) => {
+        state.loading = false;
+        state.projects = state.projects.filter((project) => project._id !== action.payload);
+        if (state.currentProject?._id === action.payload) {
+          state.currentProject = null;
+        }
+      })
+      .addCase(deleteProject.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Add Team Member
+      .addCase(addTeamMember.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addTeamMember.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.projects.findIndex((project) => project._id === action.payload._id);
+        if (index !== -1) {
+          state.projects[index] = action.payload;
+        }
+        if (state.currentProject?._id === action.payload._id) {
+          state.currentProject = action.payload;
+        }
+      })
+      .addCase(addTeamMember.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Remove Team Member
+      .addCase(removeTeamMember.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(removeTeamMember.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.projects.findIndex((project) => project._id === action.payload._id);
+        if (index !== -1) {
+          state.projects[index] = action.payload;
+        }
+        if (state.currentProject?._id === action.payload._id) {
+          state.currentProject = action.payload;
+        }
+      })
+      .addCase(removeTeamMember.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Add Milestone
+      .addCase(addMilestone.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addMilestone.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.projects.findIndex((project) => project._id === action.payload._id);
+        if (index !== -1) {
+          state.projects[index] = action.payload;
+        }
+        if (state.currentProject?._id === action.payload._id) {
+          state.currentProject = action.payload;
+        }
+      })
+      .addCase(addMilestone.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Update Milestone Status
+      .addCase(updateMilestoneStatus.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateMilestoneStatus.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.projects.findIndex((project) => project._id === action.payload._id);
+        if (index !== -1) {
+          state.projects[index] = action.payload;
+        }
+        if (state.currentProject?._id === action.payload._id) {
+          state.currentProject = action.payload;
+        }
+      })
+      .addCase(updateMilestoneStatus.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Fetch Project By ID
+      .addCase(fetchProjectById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchProjectById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentProject = action.payload;
+      })
+      .addCase(fetchProjectById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+  },
+});
+
+export const { setCurrentProject, clearError } = projectSlice.actions;
+export default projectSlice.reducer;
