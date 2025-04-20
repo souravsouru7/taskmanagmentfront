@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
- const API_URL = 'http://88.222.212.13:3000/api/users';
+ const API_URL = 'https://88.222.212.13:3000/api/users';
 // const API_URL = 'http://localhost:5000/api/users';
 
 // Create axios instance with auth header
