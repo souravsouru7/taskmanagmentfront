@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
- const API_URL = 'https://88.222.212.13:3000/api';
+ const API_URL = 'https://www.bakerycrm.shop/api';
 // const API_URL = 'http://localhost:5000/api';
 
 // Create axios instance with auth token
@@ -329,4 +329,4 @@ const projectSlice = createSlice({
 });
 
 export const { setCurrentProject, clearError } = projectSlice.actions;
-export default projectSlice.reducer;
+export default projectSlice.reducer; 
